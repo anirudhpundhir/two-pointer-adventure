@@ -1,0 +1,287 @@
+<!-- two-pointer-intro.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Two-Pointer Starter Guide</title>
+<style>
+  :root{
+    --bg1:#667eea; --bg2:#764ba2;
+    --glass1:rgba(255,255,255,.18); --glass2:rgba(255,255,255,.08);
+    --gold:#ffeb3b; --cyan:#4fc3f7;
+  }
+  *{ box-sizing:border-box }
+  html,body{ height:100% }
+  body{
+    margin:0; font-family:Arial, Helvetica, sans-serif; color:#fff;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    overflow:hidden;
+  }
+
+  .wrap{
+    width:100vw; height:100vh; display:grid; place-items:center;
+  }
+  .deck{
+    width:min(1100px,94vw); height:min(680px,88vh); position:relative;
+    background:linear-gradient(135deg,var(--glass1),var(--glass2));
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:20px; backdrop-filter:blur(10px);
+    box-shadow:0 20px 60px rgba(0,0,0,.35); overflow:hidden;
+    display:grid; grid-template-rows:auto 1fr auto;
+  }
+
+  header{
+    padding:18px 22px; text-align:center;
+    text-shadow:0 6px 22px rgba(0,0,0,.45);
+  }
+  header h1{ margin:.25rem 0 .35rem; font-size:clamp(24px,3.8vw,38px) }
+  header p{ margin:0; opacity:.9 }
+
+  .slides{ position:relative; overflow:hidden }
+  .slide{
+    position:absolute; inset:0; padding:24px clamp(16px,2.2vw,28px) 12px;
+    opacity:0; transform:translateX(40px); transition:opacity .35s ease, transform .35s ease;
+    overflow:auto;
+  }
+  .slide.active{ opacity:1; transform:none }
+  h2{ margin:6px 0 12px; color:var(--gold) }
+  h3{ margin:16px 0 8px; color:var(--cyan) }
+
+  .card{
+    background:linear-gradient(135deg, rgba(0,0,0,.35), rgba(255,255,255,.06));
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:14px; padding:16px; margin:12px 0;
+  }
+  ul { margin:8px 0 0 18px }
+  li { margin:6px 0 }
+
+  .code-block{
+    background:linear-gradient(135deg, rgba(0,0,0,.42), rgba(0,0,0,.24));
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:12px; padding:14px;
+    font-family:"Courier New", monospace; line-height:1.7; overflow:auto;
+    margin:10px 0;
+  }
+  .grid{
+    display:grid; gap:14px; grid-template-columns:1fr; margin-top:8px;
+  }
+  @media (min-width:860px){ .grid{ grid-template-columns:1fr 1fr } }
+
+  footer{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; gap:10px;
+    background:linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.18));
+    border-top:1px solid rgba(255,255,255,.2);
+  }
+  .nav{
+    display:flex; gap:10px;
+  }
+  .btn{
+    padding:12px 16px; border-radius:999px; font-weight:800;
+    border:1px solid rgba(255,255,255,.35);
+    color:#fff; background:linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.12));
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.28) }
+  .btn.primary{ color:#333; background:linear-gradient(135deg, #ffeb3b, #ffc107) }
+
+  .dots{ display:flex; gap:8px; align-items:center; justify-content:center }
+  .dot{
+    width:10px; height:10px; border-radius:50%;
+    background:rgba(255,255,255,.35);
+    border:1px solid rgba(255,255,255,.6);
+  }
+  .dot.active{ background:#fff }
+
+  .links{ display:flex; gap:10px; flex-wrap:wrap }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="deck" aria-live="polite">
+      <header>
+        <h1>Two-Pointer Starter Guide</h1>
+        <p>Three quick pages: definition → patterns → examples</p>
+      </header>
+
+      <div class="slides">
+        <!-- Page 1: Definition -->
+        <article class="slide active" id="s0">
+          <h2>What is the Two-Pointer Technique?</h2>
+          <div class="card">
+            <p><strong>Two pointers</strong> means keeping two indices (often <em>left</em> and <em>right</em>) and moving them based on a rule until a condition is met. It often turns quadratic scans into linear time.</p>
+          </div>
+          <div class="grid">
+            <div class="card">
+              <h3>Why it’s fast</h3>
+              <ul>
+                <li>Each pointer moves at most <code>n</code> times → <strong>O(n)</strong></li>
+                <li>Great for <em>sorted</em> arrays/strings and <em>pair/interval</em> problems</li>
+                <li>Saves extra memory vs brute force</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Common moves</h3>
+              <ul>
+                <li><strong>Opposite Ends:</strong> move inward (pair sum, container, palindrome)</li>
+                <li><strong>Same Direction:</strong> slow/fast (remove dups, partitioning)</li>
+                <li><strong>Meet-in-the-middle:</strong> search for first/last mismatch</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Page 2: Patterns & when to use -->
+        <article class="slide" id="s1">
+          <h2>Core Patterns & When to Use</h2>
+          <div class="card">
+            <h3>1) Opposite Ends (sorted or ordered data)</h3>
+            <ul>
+              <li><strong>Rule:</strong> if sum too small → move left++; if too big → right--</li>
+              <li>Examples: Two Sum (sorted), Container With Most Water, Palindrome checks</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>2) Same Direction (slow/fast)</h3>
+            <ul>
+              <li><strong>Rule:</strong> fast explores; slow lags to build answer</li>
+              <li>Examples: Remove Duplicates in Sorted Array, partitioning by condition</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>3) Bidirectional Matching</h3>
+            <ul>
+              <li>Compare characters/items from both ends; meet in the middle</li>
+              <li>Examples: Valid Palindrome (with/without one deletion)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>When to reach for Two Pointers</h3>
+            <ul>
+              <li>Sorted array/string; need a pair/interval answer</li>
+              <li>Can decide the next move from local info (no backtracking)</li>
+              <li>Want O(n) or O(n log n) vs O(n²)</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Page 3: Worked Java examples -->
+        <article class="slide" id="s2">
+          <h2>Worked Examples (Java)</h2>
+
+          <div class="card">
+            <h3>Two Sum (sorted)</h3>
+            <div class="code-block"><pre>public static int[] twoSumSorted(int[] nums, int target) {
+  int left = 0, right = nums.length - 1;
+  while (left &lt; right) {
+    int sum = nums[left] + nums[right];
+    if (sum == target) return new int[]{ left, right };
+    if (sum &lt; target) left++;
+    else right--;
+  }
+  return new int[]{ -1, -1 };
+}</pre></div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <h3>Palindrome Check</h3>
+              <div class="code-block"><pre>public static boolean isPalindrome(String s) {
+  String t = s.replaceAll("[^A-Za-z0-9]", "").toLowerCase();
+  int left = 0, right = t.length() - 1;
+  while (left &lt; right) {
+    if (t.charAt(left) != t.charAt(right)) return false;
+    left++; right--;
+  }
+  return true;
+}</pre></div>
+            </div>
+            <div class="card">
+              <h3>Container With Most Water</h3>
+              <div class="code-block"><pre>public static int maxArea(int[] h) {
+  int left = 0, right = h.length - 1, best = 0;
+  while (left &lt; right) {
+    int area = Math.min(h[left], h[right]) * (right - left);
+    if (area &gt; best) best = area;
+    if (h[left] &lt; h[right]) left++;
+    else right--;
+  }
+  return best;
+}</pre></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Bonus: Remove Duplicates (in-place)</h3>
+            <div class="code-block"><pre>public static int removeDuplicates(int[] nums) {
+  if (nums.length == 0) return 0;
+  int slow = 0;
+  for (int fast = 1; fast &lt; nums.length; fast++) {
+    if (nums[fast] != nums[slow]) {
+      nums[++slow] = nums[fast];
+    }
+  }
+  return slow + 1;
+}</pre></div>
+          </div>
+        </article>
+      </div>
+
+      <footer>
+        <div class="nav">
+          <button class="btn" id="prevBtn" aria-label="Previous page">⬅️ Prev</button>
+          <button class="btn" id="nextBtn" aria-label="Next page">Next ➡️</button>
+        </div>
+
+        <div class="dots" aria-hidden="true">
+          <div class="dot active" data-i="0"></div>
+          <div class="dot" data-i="1"></div>
+          <div class="dot" data-i="2"></div>
+        </div>
+
+        <div class="links">
+          <a class="btn primary" href="./two-pointer-kingdom-story.html">Start the Adventure</a>
+          <a class="btn" href="./kingdom-door.html">Back to Gate</a>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+<script>
+  // Simple 3-pager controller
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = [...document.querySelectorAll('.dot')];
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let i = 0;
+
+  function show(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, idx)=> s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx)=> d.classList.toggle('active', idx === i));
+    prevBtn.disabled = (i === 0);
+    nextBtn.disabled = (i === slides.length - 1);
+  }
+
+  prevBtn.addEventListener('click', ()=> show(i-1));
+  nextBtn.addEventListener('click', ()=> show(i+1));
+  dots.forEach(d => d.addEventListener('click', ()=> show(Number(d.dataset.i))));
+
+  // Keyboard arrows
+  document.addEventListener('keydown', e=>{
+    if (e.key === 'ArrowRight') show(i+1);
+    if (e.key === 'ArrowLeft')  show(i-1);
+  });
+
+  // Basic swipe/touch
+  let sx = 0;
+  document.addEventListener('touchstart', e => sx = e.touches[0].clientX, {passive:true});
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) { if (dx < 0) show(i+1); else show(i-1); }
+  }, {passive:true});
+</script>
+</body>
+</html>
